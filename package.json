@@ -10,7 +10,8 @@
     "lib/"
   ],
   "scripts": {
-    "build": "tsc src/main.ts --outDir build/",
+    "build": "tsc -p tsconfig.json",
+    "dev": "rg --files | rg -v build | entr -rc time npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -27,8 +28,14 @@
     "url": "https://github.com/Schoonology/turabian/issues"
   },
   "homepage": "https://github.com/Schoonology/turabian#readme",
-  "dependencies": {},
+  "dependencies": {
+    "marked": "^12.0.2",
+    "pagedjs": "^0.4.3",
+    "puppeteer": "^22.7.1",
+    "yargs": "^17.7.2"
+  },
   "devDependencies": {
+    "@types/yargs": "^17.0.32",
     "typescript": "^5.4.5"
   }
 }
