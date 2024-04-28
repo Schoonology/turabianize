@@ -2,8 +2,15 @@
   "name": "turabian",
   "version": "1.0.0",
   "description": "A CLI to generate Turabian-formatted PDFs from source files (e.g. Markdown).",
-  "main": "index.js",
+  "main": "src/main.ts",
+  "bin": {
+    "turabian": "build/main.js"
+  },
+  "files": [
+    "lib/"
+  ],
   "scripts": {
+    "build": "tsc src/main.ts --outDir build/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,5 +27,8 @@
     "url": "https://github.com/Schoonology/turabian/issues"
   },
   "homepage": "https://github.com/Schoonology/turabian#readme",
-  "dependencies": {}
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
 }
