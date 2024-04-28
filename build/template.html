@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{data.title}}</title>
+  <style>
+    body {
+      font-size: 12pt;
+      font-family: "Times New Roman", serif;
+      line-height: 24pt;
+    }
+
+    @page {
+      margin: 1in;
+      size: letter;
+
+      @top-right {
+        content: counter(page);
+        line-height: 1in;
+      }
+    }
+
+    @page:first {
+      @top-right {
+        content: none;
+      }
+    }
+
+    .title {
+      font-size: 15pt;
+      font-weight: bold;
+    }
+
+    .subtitle {
+      font-weight: bold;
+    }
+
+    #title-page {
+      break-after: always;
+      counter-reset: page 0;
+      display: flex;
+      height: 100%;
+      flex-direction: column;
+      justify-content: space-evenly;
+      text-align: center;
+    }
+
+    .footnote {
+      float: footnote;
+      font-size: 10pt;
+      line-height: 12pt;
+      text-indent: 0.5in;
+    }
+
+    p {
+      text-indent: 0.5in;
+    }
+
+    blockquote {
+      margin: 0 0 0 0.5in;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .pagedjs_footnote_content::before {
+      content: '';
+      display: block;
+      margin-bottom: 1rem;
+      width: 33%;
+      border-bottom: 1px solid;
+    }
+
+    .pagedjs_footnote_area,
+    .pagedjs_footnote_content {
+      overflow: visible !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="title-page">
+    <header>
+      <h1 class="title">{{data.title}}</h1>
+      <div class="subtitle">{{data.subtitle}}</div>
+    </header>
+    <footer>
+      <div>{{data.author}}</div>
+      <div>{{data.class}}</div>
+      <div>{{data.date}}</div>
+    </footer>
+  </div>
+
+  {{{ html }}}
+
+</body>
+
+</html>

@@ -1,8 +1,19 @@
 #!/usr/bin/env node
-import { marked } from "marked";
-import puppeteer from "puppeteer";
 import { readFile } from "node:fs/promises";
+import matter from "gray-matter";
+import { marked } from "marked";
+import { dirname, resolve } from "node:path";
+import puppeteer from "puppeteer";
+import Handlebars from "handlebars";
 const yargs = require("yargs"); // Specific to yargs, an old and reliable library.
+
+const scriptPath = resolve(
+  dirname(__dirname),
+  "node_modules",
+  "pagedjs",
+  "dist",
+  "paged.polyfill.js"
+);
 
 type Baton = { input: string; output: string };
 
@@ -27,36 +38,28 @@ async function parseArgs(): Promise<Baton> {
     .parse();
 }
 
+async function renderToHtml(input: string, template: string): Promise<string> {
+  const { content, data } = matter(input);
+  const render = Handlebars.compile(template);
+
+  const html = await marked.parse(content);
+
+  return render({
+    html,
+    data,
+  });
+}
+
 async function renderToPdf({ input, output }: Baton): Promise<void> {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
 
   await page.setContent(input, { waitUntil: "domcontentloaded" });
-
-  // Wait until all images and fonts have loaded
-  // Courtesy of: https://github.blog/2021-06-22-framework-building-open-graph-images/
-  await page.evaluate(async () => {
-    const selectors = Array.from(document.querySelectorAll("img"));
-    await Promise.all([
-      document.fonts.ready,
-      ...selectors.map((img) => {
-        // Image has already finished loading, let’s see if it worked
-        if (img.complete) {
-          // Image loaded and has presence
-          if (img.naturalHeight !== 0) return;
-          // Image failed, so it has no height
-          throw new Error(`Image failed to load: ${img.src}`);
-        }
-        // Image hasn’t loaded yet, added an event listener to know when it does
-        return new Promise((resolve, reject) => {
-          img.addEventListener("load", resolve);
-          img.addEventListener("error", () => {
-            reject(new Error(`Error loading image: ${img.src}`));
-          });
-        });
-      }),
-    ]);
+  await page.addScriptTag({
+    path: scriptPath,
   });
+  await page.waitForNetworkIdle();
+  await page.waitForSelector(".pagedjs_pages");
 
   await page.pdf({
     printBackground: true,
@@ -77,7 +80,9 @@ async function run() {
   const argv = await parseArgs();
 
   const inputContent = await readFile(argv.input, "utf-8");
-  const html = await marked.parse(inputContent);
+  const templateContent = await readFile(__dirname + "/template.html", "utf-8");
+
+  const html = await renderToHtml(inputContent, templateContent);
 
   await renderToPdf({ input: html, output: argv.output });
 }

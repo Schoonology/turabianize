@@ -4,10 +4,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const marked_1 = require("marked");
-const puppeteer_1 = __importDefault(require("puppeteer"));
 const promises_1 = require("node:fs/promises");
+const gray_matter_1 = __importDefault(require("gray-matter"));
+const marked_1 = require("marked");
+const node_path_1 = require("node:path");
+const puppeteer_1 = __importDefault(require("puppeteer"));
+const handlebars_1 = __importDefault(require("handlebars"));
 const yargs = require("yargs"); // Specific to yargs, an old and reliable library.
+const scriptPath = (0, node_path_1.resolve)((0, node_path_1.dirname)(__dirname), "node_modules", "pagedjs", "dist", "paged.polyfill.js");
 async function parseArgs() {
     return yargs(process.argv)
         .option("input", {
@@ -28,35 +32,24 @@ async function parseArgs() {
     })
         .parse();
 }
+async function renderToHtml(input, template) {
+    const { content, data } = (0, gray_matter_1.default)(input);
+    const render = handlebars_1.default.compile(template);
+    const html = await marked_1.marked.parse(content);
+    return render({
+        html,
+        data,
+    });
+}
 async function renderToPdf({ input, output }) {
     const browser = await puppeteer_1.default.launch();
     const page = await browser.newPage();
     await page.setContent(input, { waitUntil: "domcontentloaded" });
-    // Wait until all images and fonts have loaded
-    // Courtesy of: https://github.blog/2021-06-22-framework-building-open-graph-images/
-    await page.evaluate(async () => {
-        const selectors = Array.from(document.querySelectorAll("img"));
-        await Promise.all([
-            document.fonts.ready,
-            ...selectors.map((img) => {
-                // Image has already finished loading, let’s see if it worked
-                if (img.complete) {
-                    // Image loaded and has presence
-                    if (img.naturalHeight !== 0)
-                        return;
-                    // Image failed, so it has no height
-                    throw new Error(`Image failed to load: ${img.src}`);
-                }
-                // Image hasn’t loaded yet, added an event listener to know when it does
-                return new Promise((resolve, reject) => {
-                    img.addEventListener("load", resolve);
-                    img.addEventListener("error", () => {
-                        reject(new Error(`Error loading image: ${img.src}`));
-                    });
-                });
-            }),
-        ]);
+    await page.addScriptTag({
+        path: scriptPath,
     });
+    await page.waitForNetworkIdle();
+    await page.waitForSelector(".pagedjs_pages");
     await page.pdf({
         printBackground: true,
         format: "Letter",
@@ -73,7 +66,8 @@ async function renderToPdf({ input, output }) {
 async function run() {
     const argv = await parseArgs();
     const inputContent = await (0, promises_1.readFile)(argv.input, "utf-8");
-    const html = await marked_1.marked.parse(inputContent);
+    const templateContent = await (0, promises_1.readFile)(__dirname + "/template.html", "utf-8");
+    const html = await renderToHtml(inputContent, templateContent);
     await renderToPdf({ input: html, output: argv.output });
 }
 run().catch((e) => console.error("Failed with:", e));
