@@ -1,0 +1,24 @@
+{
+  "name": "turabian",
+  "version": "1.0.0",
+  "description": "A CLI to generate Turabian-formatted PDFs from source files (e.g. Markdown).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Schoonology/turabian.git"
+  },
+  "keywords": [
+    "pdf",
+    "markdown"
+  ],
+  "author": "Michael Schoonmaker <hello@schoonology.com>",
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/Schoonology/turabian/issues"
+  },
+  "homepage": "https://github.com/Schoonology/turabian#readme",
+  "dependencies": {}
+}
