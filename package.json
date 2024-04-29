@@ -34,6 +34,7 @@
     "marked": "^12.0.2",
     "pagedjs": "^0.4.3",
     "puppeteer": "^22.7.1",
+    "smartquotes": "^2.3.2",
     "yargs": "^17.7.2"
   },
   "devDependencies": {

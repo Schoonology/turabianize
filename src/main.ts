@@ -5,6 +5,7 @@ import { marked } from "marked";
 import { dirname, resolve } from "node:path";
 import puppeteer from "puppeteer";
 import Handlebars from "handlebars";
+import smartquotes from "smartquotes";
 const yargs = require("yargs"); // Specific to yargs, an old and reliable library.
 
 const scriptPath = resolve(
@@ -14,6 +15,19 @@ const scriptPath = resolve(
   "dist",
   "paged.polyfill.js"
 );
+
+function footnotes(input: string): string {
+  const REGEX = /\^\{[^\}]+\}/g;
+
+  for (const [match, ..._] of input.matchAll(REGEX)) {
+    input = input.replace(
+      match,
+      `<span class="footnote">${match.slice(2, -1)}</span>`
+    );
+  }
+
+  return input;
+}
 
 type Baton = { input: string; output: string };
 
@@ -42,7 +56,7 @@ async function renderToHtml(input: string, template: string): Promise<string> {
   const { content, data } = matter(input);
   const render = Handlebars.compile(template);
 
-  const html = await marked.parse(content);
+  const html = await marked.parse(footnotes(smartquotes(content)));
 
   return render({
     html,
