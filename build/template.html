@@ -9,7 +9,7 @@
     body {
       font-size: 12pt;
       font-family: "Times New Roman", serif;
-      line-height: 24pt;
+      line-height: 27pt;
     }
 
     @page {
@@ -67,9 +67,18 @@
     }
 
     blockquote {
-      margin: 0 0 0 0.5in;
+      /*
+      In order to give a blank space, we need to make up for the difference
+      in line heights between a blockquote and the surrounding text. This is
+      half the difference in line heights.
+      */
+      margin: 6pt 0 6pt 0.5in;
       padding: 0;
-      line-height: 1;
+      line-height: 15pt;
+    }
+
+    blockquote > p:first-child {
+      text-indent: 0;
     }
 
     .pagedjs_footnote_content::before {
