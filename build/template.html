@@ -77,7 +77,7 @@
       line-height: 15pt;
     }
 
-    blockquote > p:first-child {
+    blockquote>p:first-child {
       text-indent: 0;
     }
 
@@ -97,17 +97,19 @@
 </head>
 
 <body>
-  <div id="title-page">
-    <header>
-      <h1 class="title">{{data.title}}</h1>
-      <div class="subtitle">{{data.subtitle}}</div>
-    </header>
-    <footer>
-      <div>{{data.author}}</div>
-      <div>{{data.class}}</div>
-      <div>{{data.date}}</div>
-    </footer>
-  </div>
+  {{#if data.title}}
+    <div id="title-page">
+      <header>
+        <h1 class="title">{{{data.title}}}</h1>
+        <div class="subtitle">{{{data.subtitle}}}</div>
+      </header>
+      <footer>
+        <div>{{data.author}}</div>
+        <div>{{data.class}}</div>
+        <div>{{data.date}}</div>
+      </footer>
+    </div>
+  {{/if}}
 
   {{{ html }}}
 
