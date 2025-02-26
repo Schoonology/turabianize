@@ -68,7 +68,17 @@ async function renderToHtml(input: string, template: string): Promise<string> {
   const { content, data } = matter(input);
   const render = Handlebars.compile(template);
 
-  const html = await marked.parse(footnotes(ellipses(smartquotes(content))));
+  if (Array.isArray(data.bibliography)) {
+    data.bibliography = data.bibliography.map((line) =>
+      marked.parseInline(line, {})
+    );
+  }
+
+  const html = await marked.parse(
+    footnotes(
+      ellipses(content.replaceAll(/\(\(/g, "(").replaceAll(/\)\)/g, ")"))
+    )
+  );
 
   return render({
     html,

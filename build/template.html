@@ -47,6 +47,22 @@
       text-align: center;
     }
 
+    #bibliography {
+      break-before: always;
+    }
+
+    #bibliography .title {
+      margin-bottom: 2.4rem;
+      text-align: center;
+    }
+
+    .bibliography__entry {
+      line-height: 1.1rem;
+      margin-bottom: 1.1rem;
+      padding-left: 0.5in;
+      text-indent: -0.5in;
+    }
+
     .footnote {
       float: footnote;
       font-size: 10pt;
@@ -113,6 +129,14 @@
 
   {{{ html }}}
 
+  {{#if data.bibliography}}
+  <div id="bibliography">
+    <h1 class="title">Bibliography</h1>
+    {{#each data.bibliography}}
+    <div class="bibliography__entry">{{{.}}}</div>
+    {{/each}}
+  </div>
+  {{/if}}
 </body>
 
 </html>
