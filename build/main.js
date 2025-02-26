@@ -10,7 +10,6 @@ const marked_1 = require("marked");
 const node_path_1 = require("node:path");
 const puppeteer_1 = __importDefault(require("puppeteer"));
 const handlebars_1 = __importDefault(require("handlebars"));
-const smartquotes_1 = __importDefault(require("smartquotes"));
 const yargs = require("yargs"); // Specific to yargs, an old and reliable library.
 const scriptPath = (0, node_path_1.resolve)((0, node_path_1.dirname)(__dirname), "node_modules", "pagedjs", "dist", "paged.polyfill.js");
 function ellipses(input) {
@@ -50,7 +49,10 @@ async function parseArgs() {
 async function renderToHtml(input, template) {
     const { content, data } = (0, gray_matter_1.default)(input);
     const render = handlebars_1.default.compile(template);
-    const html = await marked_1.marked.parse(footnotes(ellipses((0, smartquotes_1.default)(content))));
+    if (Array.isArray(data.bibliography)) {
+        data.bibliography = data.bibliography.map((line) => marked_1.marked.parseInline(line, {}));
+    }
+    const html = await marked_1.marked.parse(footnotes(ellipses(content.replaceAll(/\(\(/g, "(").replaceAll(/\)\)/g, ")"))));
     return render({
         html,
         data,
