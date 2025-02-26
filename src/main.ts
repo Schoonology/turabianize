@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import matter from "gray-matter";
 import { marked } from "marked";
 import { dirname, resolve } from "node:path";
@@ -41,7 +41,7 @@ function footnotes(input: string): string {
   return input;
 }
 
-type Baton = { input: string; output: string };
+type Baton = { html?: string; input: string; output: string };
 
 async function parseArgs(): Promise<Baton> {
   return yargs(process.argv)
@@ -55,8 +55,14 @@ async function parseArgs(): Promise<Baton> {
     })
     .option("output", {
       alias: "o",
-      demandOption: true,
       desc: "Path to the output PDF file",
+      normalize: true,
+      requiresArg: true,
+      type: "string",
+    })
+    .option("html", {
+      alias: "f",
+      desc: "Path to the output HTML file",
       normalize: true,
       requiresArg: true,
       type: "string",
@@ -86,11 +92,14 @@ async function renderToHtml(input: string, template: string): Promise<string> {
   });
 }
 
-async function renderToPdf({ input, output }: Baton): Promise<void> {
+async function renderToPdf({ html, input, output }: Baton): Promise<void> {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
 
-  await page.setContent(input, { waitUntil: "domcontentloaded" });
+  // Initialize the page for relative URLs.
+  await page.goto(`file://${process.cwd()}/${input}`);
+
+  await page.setContent(html ?? "", { waitUntil: "domcontentloaded" });
   await page.addScriptTag({
     path: scriptPath,
   });
@@ -117,6 +126,7 @@ function countWords(markdown: string): string {
   const { content, data } = matter(markdown);
 
   const actualCount = content
+    .replaceAll(/\(\([^)]*\)\)/g, "")
     .split(/[\s-–—…\.\^]+/)
     .filter((protoWord) => protoWord.length)
     .filter((protoWord) => protoWord.match(/[a-zA-Z]+/)).length;
@@ -158,7 +168,11 @@ async function run() {
 
   const html = await renderToHtml(inputContent, templateContent);
 
-  await renderToPdf({ input: html, output: argv.output });
+  if (argv.html) {
+    await writeFile(argv.html, html);
+  }
+
+  await renderToPdf({ ...argv, html });
 
   printReport({ content: inputContent, startTime });
 }

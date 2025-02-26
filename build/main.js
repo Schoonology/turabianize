@@ -38,8 +38,14 @@ async function parseArgs() {
     })
         .option("output", {
         alias: "o",
-        demandOption: true,
         desc: "Path to the output PDF file",
+        normalize: true,
+        requiresArg: true,
+        type: "string",
+    })
+        .option("html", {
+        alias: "f",
+        desc: "Path to the output HTML file",
         normalize: true,
         requiresArg: true,
         type: "string",
@@ -58,10 +64,12 @@ async function renderToHtml(input, template) {
         data,
     });
 }
-async function renderToPdf({ input, output }) {
+async function renderToPdf({ html, input, output }) {
     const browser = await puppeteer_1.default.launch();
     const page = await browser.newPage();
-    await page.setContent(input, { waitUntil: "domcontentloaded" });
+    // Initialize the page for relative URLs.
+    await page.goto(`file://${process.cwd()}/${input}`);
+    await page.setContent(html ?? "", { waitUntil: "domcontentloaded" });
     await page.addScriptTag({
         path: scriptPath,
     });
@@ -84,6 +92,7 @@ function countWords(markdown) {
     // Trim off front matter first.
     const { content, data } = (0, gray_matter_1.default)(markdown);
     const actualCount = content
+        .replaceAll(/\(\([^)]*\)\)/g, "")
         .split(/[\s-–—…\.\^]+/)
         .filter((protoWord) => protoWord.length)
         .filter((protoWord) => protoWord.match(/[a-zA-Z]+/)).length;
@@ -109,7 +118,10 @@ async function run() {
     const inputContent = await (0, promises_1.readFile)(argv.input, "utf-8");
     const templateContent = await (0, promises_1.readFile)(__dirname + "/template.html", "utf-8");
     const html = await renderToHtml(inputContent, templateContent);
-    await renderToPdf({ input: html, output: argv.output });
+    if (argv.html) {
+        await (0, promises_1.writeFile)(argv.html, html);
+    }
+    await renderToPdf({ ...argv, html });
     printReport({ content: inputContent, startTime });
 }
 run().catch((e) => console.error("Failed with:", e));
