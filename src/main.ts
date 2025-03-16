@@ -132,15 +132,35 @@ function countWords(markdown: string): string {
     .filter((protoWord) => protoWord.match(/[a-zA-Z]+/)).length;
   const targetCount = data.word_count;
 
+  if (
+    typeof targetCount === "string" &&
+    (targetCount.startsWith(">") || targetCount.startsWith("<"))
+  ) {
+    const operation = targetCount[0];
+    const targetNumber = Number(targetCount.slice(1));
+    const difference = Math.abs(targetNumber - actualCount);
+
+    if (operation === '>') {
+      return `${actualCount} >= ${targetNumber} ${actualCount >= targetNumber
+        ? "✅"
+        : `❌ (${-difference})`
+        }`;
+    } else {
+      return `${actualCount} <= ${targetNumber} ${actualCount <= targetNumber
+        ? "✅"
+        : `❌ (${difference})`
+        }`;
+    }
+  }
+
   if (targetCount) {
     const difference = Math.abs(targetCount - actualCount);
     const epsilon = targetCount * 0.1;
 
-    return `${actualCount} / ${targetCount} ${
-      difference <= epsilon
-        ? "✅"
-        : `❌ (${targetCount > actualCount ? "+" : "-"}${difference - epsilon})`
-    }`;
+    return `${actualCount} / ${targetCount} ${difference <= epsilon
+      ? "✅"
+      : `❌ (${targetCount > actualCount ? "+" : "-"}${difference - epsilon})`
+      }`;
   } else {
     return String(actualCount);
   }
