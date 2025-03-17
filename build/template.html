@@ -28,12 +28,8 @@
       }
     }
 
-    .title {
+    .title, .subtitle {
       font-size: 1.2rem;
-      font-weight: bold;
-    }
-
-    .subtitle {
       font-weight: bold;
     }
 
@@ -52,13 +48,13 @@
     }
 
     #bibliography .title {
-      margin-bottom: 2.4rem;
+      margin-bottom: 2.2rem;
       text-align: center;
     }
 
     .bibliography__entry {
-      line-height: 1.1rem;
-      margin-bottom: 1.1rem;
+      line-height: 1.2em;
+      margin-bottom: 1.2rem;
       padding-left: 0.5in;
       text-indent: -0.5in;
     }
@@ -66,7 +62,7 @@
     .footnote {
       float: footnote;
       font-size: 10pt;
-      line-height: 1.1rem;
+      line-height: 1.2em;
       text-indent: 0.5in;
     }
 
@@ -90,7 +86,7 @@
       */
       margin: 0.5rem 0 0.5rem 0.5in;
       padding: 0;
-      line-height: 1.2rem;
+      line-height: 1.2em;
     }
 
     blockquote>p:first-child {
@@ -104,6 +100,7 @@
     .pagedjs_footnote_content::before {
       content: '';
       display: block;
+      margin-top: 0.6rem;
       width: 33%;
       border-bottom: 1px solid;
     }
@@ -114,20 +111,25 @@
     }
 
     [data-note] {
-      margin-top: 1rem;
+      margin-top: 1.2em;
+    }
+
+    h1, h2, h3 {
+      line-height: 1.2rem;
+      margin-bottom: 1.2rem;
+      margin-top: 2.2rem;
+      text-align: center;
     }
 
     h1 {
       font-size: 1rem;
       font-weight: bold;
-      text-align: center;
     }
 
     h2 {
       font-size: 1rem;
       font-style: italic;
       font-weight: normal;
-      text-align: center;
     }
 
     figure {
@@ -141,7 +143,7 @@
 
     figcaption {
       text-align: left;
-      margin-bottom: 1rem;
+      margin-bottom: 1.2rem;
     }
   </style>
 </head>
@@ -150,7 +152,7 @@
   {{#if data.title}}
     <div id="title-page">
       <header>
-        <h1 class="title">{{{data.title}}}</h1>
+        <h1 class="title">{{{data.title}}}{{#if data.subtitle}}:{{/if}}</h1>
         <div class="subtitle">{{{data.subtitle}}}</div>
       </header>
       <footer>
