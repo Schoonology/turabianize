@@ -1,6 +1,6 @@
 {
   "name": "turabianize",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "A CLI to generate Turabian-formatted PDFs from source files (e.g. Markdown).",
   "main": "src/main.ts",
   "bin": {
