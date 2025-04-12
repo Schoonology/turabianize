@@ -18,7 +18,9 @@
 
       @top-right {
         content: counter(page);
-        line-height: 1in;
+        line-height: 1em;
+        margin-top: 0.5in;
+        padding: 0;
       }
     }
 
@@ -48,11 +50,16 @@
     }
 
     #bibliography .title {
-      margin-bottom: 2.2rem;
+      /**
+       * Because the bibliography is single-spaced, its line-height
+       * is 1.2, not 2.2. As a result, we need to make up for
+       * the other missing "half".
+       */
+      margin-bottom: 1.8rem;
       text-align: center;
     }
 
-    .bibliography__entry {
+    p.bibliography__entry {
       line-height: 1.2em;
       margin-bottom: 1.2rem;
       padding-left: 0.5in;
@@ -73,6 +80,7 @@
     }
 
     p {
+      break-inside: auto;
       margin: 0;
       padding: 0;
       text-indent: 0.5in;
@@ -115,10 +123,15 @@
     }
 
     h1, h2, h3 {
-      line-height: 1.2rem;
-      margin-bottom: 1.2rem;
-      margin-top: 2.2rem;
+      break-after: avoid;
+      margin: 1.2rem 0 0;
+      padding: 0;
+      page-break-after: avoid;
       text-align: center;
+
+      &:first-child {
+        margin: 0;
+      }
     }
 
     h1 {
@@ -169,7 +182,7 @@
   <div id="bibliography">
     <h1 class="title">Bibliography</h1>
     {{#each data.bibliography}}
-    <div class="bibliography__entry">{{{.}}}</div>
+    <p class="bibliography__entry">{{{.}}}</p>
     {{/each}}
   </div>
   {{/if}}
