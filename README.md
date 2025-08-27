@@ -1,7 +1,7 @@
-# Turabian
+# Turabianize
 
 ## Usage
 
 ```
-turabian -i INPUT_FILE -o OUTPUT_FILE
+turabianize -i INPUT_FILE -o OUTPUT_FILE
 ```
